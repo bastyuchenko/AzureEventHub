@@ -11,10 +11,10 @@ namespace FrameworkAzureEventHubPublisher
     {
         static void Main(string[] args)
         {
+            EventHubClient client = EventHubClient.CreateFromConnectionString("Endpoint=sb://ehtest8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=321/mX76iZUY6GtRBYYp9nzXrspGaS/mP/EZthSteS8=", "ehone");
 
+            for (int i = 0; i < 5; i++)
             {
-                EventHubClient client = EventHubClient.CreateFromConnectionString("Endpoint=sb://testgiteventhub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=GotpcwuPgGsRLrKdAqSCdiK/yxcoqGIqrGNzw8yityc=","mainhub");
-
                 client.Send(new EventData(Encoding.UTF8.GetBytes("Hello part key 1"))
                 {
                     PartitionKey = "PartitionKey1"

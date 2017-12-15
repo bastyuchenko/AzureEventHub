@@ -28,8 +28,14 @@ namespace FrameworkAzureEventHubConsumer
 //                Console.WriteLine(String.Format("Received message offset: {0} \nbody: {1}", myOffset, body));
 //            }
 
-            EventProcessorHost eventProcessorHost = new EventProcessorHost("ehph","ehone", EventHubConsumerGroup.DefaultGroupName, "Endpoint=sb://ehtest8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=321/mX76iZUY6GtRBYYp9nzXrspGaS/mP/EZthSteS8=", "DefaultEndpointsProtocol=https;AccountName=ehstrorage;AccountKey=Swt9Xx2vx98u4riTSHkW0rmFX4tP9mhTZman1YfgczBcdFa0lykdb+hoVWlxL0pyna2O6hkFxjKVd8l5CsOcDA==;EndpointSuffix=core.windows.net");
+            EventProcessorHost eventProcessorHost = new EventProcessorHost("ehph","ehone", "testGroup", "Endpoint=sb://ehtest8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=321/mX76iZUY6GtRBYYp9nzXrspGaS/mP/EZthSteS8=", "DefaultEndpointsProtocol=https;AccountName=ehstrorage;AccountKey=Swt9Xx2vx98u4riTSHkW0rmFX4tP9mhTZman1YfgczBcdFa0lykdb+hoVWlxL0pyna2O6hkFxjKVd8l5CsOcDA==;EndpointSuffix=core.windows.net");
 
+            //var epo = new EventProcessorOptions()
+            //{
+            //    InitialOffsetProvider = (partitionId) => DateTime.UtcNow.AddDays(-10),
+            //};
+
+            eventProcessorHost.ResetAllConnections();
             eventProcessorHost.RegisterEventProcessorAsync<MyEventProcessor>().Wait();
 
             Thread.Sleep(TimeSpan.FromMinutes(1));
@@ -48,15 +54,15 @@ namespace FrameworkAzureEventHubConsumer
             return Task.FromResult<object>(null);
         }
 
-        public Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
+        public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
         {
             
             foreach (var item in messages)
             {
-                Console.WriteLine($"{context.Lease.PartitionId }*****{Encoding.UTF8.GetString(item.GetBytes())}");
+                Console.WriteLine($"{context.Lease.PartitionId }*****{Encoding.UTF8.GetString(item.GetBytes())}****{Task.CurrentId}");
             }
 
-            return Task.FromResult<object>(null);
+            await context.CheckpointAsync();
         }
     }
 }
